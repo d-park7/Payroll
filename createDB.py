@@ -19,4 +19,4 @@ cursor.execute("CREATE TABLE employeeInfo (id int, firstName text, lastName text
 cursor.execute("CREATE TABLE records (id int, dateTimeIn text, dateTimeOut text)")
 
 #create the pay info table
-cursor.execute("CREATE TABLE payInfo (id int, biWeeklyStartDate text, biWeeklyEndDate text)")
+cursor.execute("CREATE TABLE payInfo (id int, pay unsigned int, biWeeklyStartDate text, biWeeklyEndDate text)")
