@@ -9,14 +9,17 @@ if conn.total_changes != 0:
     print("Failed to create database.")
     quit()
 
-# Create the cursor obj
+# create the cursor obj
 cursor = conn.cursor()
 
-# Create the employee info table
-cursor.execute("CREATE TABLE employeeInfo (id int, firstName text, lastName text)")
+# create the employee info table
+cursor.execute("CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)")
 
 # create the records table
-cursor.execute("CREATE TABLE records (id int, dateTimeIn text, dateTimeOut text)")
+cursor.execute("CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut text)")
 
-#create the pay info table
-cursor.execute("CREATE TABLE payInfo (id int, pay unsigned int, biWeeklyStartDate text, biWeeklyEndDate text)")
+# create the pay info table
+cursor.execute("CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)")
+
+# close the connection
+conn.close()
