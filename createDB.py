@@ -21,5 +21,7 @@ cursor.execute("CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut 
 # create the pay info table
 cursor.execute("CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)")
 
+# close the cursor
+cursor.close()
 # close the connection
 conn.close()
