@@ -7,7 +7,7 @@ import sys
 
 def init_db(args):
     # use 'name' to connect to the db
-    namedb = args.name
+    db_name = args.name
 
     # create the database with these tables
     # --create -c is an optional arg and raise an error if db specified does not exist
@@ -16,7 +16,7 @@ def init_db(args):
         # try to connect to the named db
         # if it already exists quit the program
         try:
-            conn = sqlite3.connect('file:{}?mode=rw'.format(namedb), uri=True)
+            conn = sqlite3.connect('file:{}?mode=rw'.format(db_name), uri=True)
         except Exception:
             dbExists = False
             pass
@@ -24,7 +24,7 @@ def init_db(args):
             print("Error: Database already exists", file=sys.stderr)
             quit()
 
-        conn = sqlite3.connect(namedb)
+        conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         cursor.execute("CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)")
         cursor.execute("CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut text)")
@@ -33,7 +33,7 @@ def init_db(args):
 
     # make the --override an optional arg
     if args.override:
-        conn = sqlite3.connect(namedb)
+        conn = sqlite3.connect(db_name)
         curosr = conn.cursor()
         cursor.execute("CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)")
         cursor.execute("CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut text)")
@@ -53,7 +53,7 @@ def init_db(args):
 def parse_args():
     # argument parser
     parser = argparse.ArgumentParser(description='Initialize the db')
-    parser.add_argument('name', help="Name of db file including the .db")
+    parser.add_argument("--name", type=str, required=True, help="Name of db file including the .db")
     parser.add_argument("-c", "--create", action='store_true', help="Create the db if not existing")
     parser.add_argument('-o', "--override", action='store_true', help="Override the specified db")
 
