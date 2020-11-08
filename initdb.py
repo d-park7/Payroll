@@ -34,7 +34,10 @@ def init_db(args):
     # make the --override an optional arg
     if args.override:
         conn = sqlite3.connect(db_name)
-        curosr = conn.cursor()
+        cursor = conn.cursor()
+        cursor.execute("DROP TABLE Employee")
+        cursor.execute("DROP TABLE Record")
+        cursor.execute("DROP TABLE Pay")
         cursor.execute("CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)")
         cursor.execute("CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut text)")
         cursor.execute("CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)")
@@ -53,7 +56,7 @@ def init_db(args):
 def parse_args():
     # argument parser
     parser = argparse.ArgumentParser(description='Initialize the db')
-    parser.add_argument("--name", type=str, required=True, help="Name of db file including the .db")
+    parser.add_argument("-n", "--name", type=str, required=True, help="Name of db file including the .db")
     parser.add_argument("-c", "--create", action='store_true', help="Create the db if not existing")
     parser.add_argument('-o', "--override", action='store_true', help="Override the specified db")
 
