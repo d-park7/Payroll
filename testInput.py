@@ -5,10 +5,10 @@ import pandas as pd
 import sqlite3
 
 def add_data():
-    """Connect to the database"""
+    """Add test data"""
+    
     engine = create_engine(f"sqlite:///test.db")
     conn = engine.connect()
-    """Add test data"""
     df = pd.DataFrame([(1, "John", "Doe")], columns = ["EmployeeId", "FirstName", "LastName"])
     df.to_sql("Employee", con=engine, if_exists="append")
     conn.commit()
