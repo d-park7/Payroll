@@ -3,11 +3,12 @@
 import sqlite3
 import argparse
 import sys
+import os
 
 
 def init_db(args):
     # use 'name' to connect to the db
-    db_name = args.name
+    db_name = add_filename_extension(args.name)
 
     # create the database with these tables
     # --create -c is an optional arg and raise an error if db specified does not exist
@@ -62,6 +63,23 @@ def init_db(args):
     conn.commit()
     # close the connection
     conn.close()
+
+    return
+
+
+def add_filename_extension(db_name: str):
+    """
+    Adds the .db ext if the name does not contain it
+
+    :param db_name:
+    :return:
+    """
+    filename, file_extension = os.path.splitext(db_name)
+    if file_extension:
+        return db_name
+    else:
+        return filename + ".db"
+
 
 
 def parse_args():
