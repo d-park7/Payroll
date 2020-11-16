@@ -16,20 +16,25 @@ def init_db(args):
         # try to connect to the named db
         # if it already exists quit the program
         try:
-            conn = sqlite3.connect('file:{}?mode=rw'.format(db_name), uri=True)
+            conn = sqlite3.connect("file:{}?mode=rw".format(db_name), uri=True)
         except Exception:
             dbExists = False
             pass
-        if (dbExists == True):
+        if dbExists == True:
             print("Error: Database already exists", file=sys.stderr)
             quit()
 
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
-        cursor.execute("CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)")
-        cursor.execute("CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut text)")
-        cursor.execute("CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)")
-
+        cursor.execute(
+            "CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)"
+        )
+        cursor.execute(
+            "CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut text)"
+        )
+        cursor.execute(
+            "CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)"
+        )
 
     # make the --override an optional arg
     if args.override:
@@ -38,9 +43,15 @@ def init_db(args):
         cursor.execute("DROP TABLE Employee")
         cursor.execute("DROP TABLE Record")
         cursor.execute("DROP TABLE Pay")
-        cursor.execute("CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)")
-        cursor.execute("CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut text)")
-        cursor.execute("CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)")
+        cursor.execute(
+            "CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)"
+        )
+        cursor.execute(
+            "CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut text)"
+        )
+        cursor.execute(
+            "CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)"
+        )
 
     # verify database is connected
     if conn.total_changes != 0:
@@ -55,10 +66,20 @@ def init_db(args):
 
 def parse_args():
     # argument parser
-    parser = argparse.ArgumentParser(description='Initialize the db')
-    parser.add_argument("-n", "--name", type=str, required=True, help="Name of db file including the .db")
-    parser.add_argument("-c", "--create", action='store_true', help="Create the db if not existing")
-    parser.add_argument('-o', "--override", action='store_true', help="Override the specified db")
+    parser = argparse.ArgumentParser(description="Initialize the db")
+    parser.add_argument(
+        "-n",
+        "--name",
+        type=str,
+        required=True,
+        help="Name of db file including the .db",
+    )
+    parser.add_argument(
+        "-c", "--create", action="store_true", help="Create the db if not existing"
+    )
+    parser.add_argument(
+        "-o", "--override", action="store_true", help="Override the specified db"
+    )
 
     # create variable to hold all args
     args = parser.parse_args()
