@@ -13,64 +13,26 @@ def init_db(args):
     # create the database with these tables
     # --create -c is an optional arg and raise an error if db specified does not exist
     if args.create:
-        dbExists = True
-        # try to connect to the named db
-        # if it already exists quit the program
-        try:
-            conn = sqlite3.connect("file:{}?mode=rw".format(db_name), uri=True)
-        except Exception:
-            dbExists = False
-            pass
-        if dbExists == True:
-            print("Error: Database already exists", file=sys.stderr)
-            quit()
-
-        conn = sqlite3.connect(db_name)
-        cursor = conn.cursor()
-        cursor.execute(
-            "CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)"
-        )
-        cursor.execute(
-            "CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut text)"
-        )
-        cursor.execute(
-            "CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)"
-        )
-
+        conn = create_new_db(db_name)
+        
     # make the --override an optional arg
     if args.override:
-        conn = sqlite3.connect(db_name)
-        cursor = conn.cursor()
-        cursor.execute("DROP TABLE Employee")
-        cursor.execute("DROP TABLE Record")
-        cursor.execute("DROP TABLE Pay")
-        cursor.execute(
-            "CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)"
-        )
-        cursor.execute(
-            "CREATE TABLE Record (RecordId int, DateTimeIn text, dateTimeOut text)"
-        )
-        cursor.execute(
-            "CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)"
-        )
+        conn = delete_existing_db(db_name)
 
     # verify database is connected
     if conn.total_changes != 0:
         print("Failed to create database.", file=sys.stderr)
         quit()
 
-    # commit changes to db
+    # commit and close the db
     conn.commit()
-    # close the connection
     conn.close()
-
     return
 
 
 def add_filename_extension(db_name: str):
     """
     Adds the .db ext if the name does not contain it
-
     :param db_name:
     :return:
     """
@@ -79,7 +41,6 @@ def add_filename_extension(db_name: str):
         return db_name
     else:
         return filename + ".db"
-
 
 
 def parse_args():
@@ -102,6 +63,56 @@ def parse_args():
     # create variable to hold all args
     args = parser.parse_args()
     return args
+
+
+def create_new_db(db_name: str):
+    """
+    Creates a new database if not already made
+    :param db_name:
+    :return sqlite3 connection:
+    """
+    dbExists = True
+    # try to connect to the named db
+    # if it already exists quit the program
+    try:
+        conn = sqlite3.connect("file:{}?mode=rw".format(db_name), uri=True)
+    except Exception:
+        dbExists = False
+        pass
+    if dbExists == True:
+        print("Error: Database already exists", file=sys.stderr)
+        quit()
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    create_tables(cursor)
+    return conn
+
+
+def delete_existing_db(db_name: str):
+    """
+    Deletes existing db and replaces it
+    :param db_name:
+    :return sqlite3 connection:
+    """
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("DROP TABLE Employee")
+    cursor.execute("DROP TABLE Record")
+    cursor.execute("DROP TABLE Pay")
+    create_tables(cursor)
+    return conn
+
+
+def create_tables(cursor):
+    cursor.execute(
+        "CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)"
+    )
+    cursor.execute(
+         "CREATE TABLE Record (RecordId int, DateTimeIn text, DateTimeOut text)"
+    )
+    cursor.execute(
+        "CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)"
+    )
 
 
 def main():
