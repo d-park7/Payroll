@@ -18,6 +18,7 @@ def init_db(args):
     # make the --override an optional arg
     if args.override:
         conn = delete_existing_db(db_name)
+        conn = create_new_db(db_name)
 
     # verify database is connected
     if conn.total_changes != 0:
@@ -51,7 +52,7 @@ def parse_args():
         "--name",
         type=str,
         required=True,
-        help="Name of db file including the .db",
+        help="Name of db file"
     )
     parser.add_argument(
         "-c", "--create", action="store_true", help="Create the db if not existing"
@@ -94,7 +95,18 @@ def delete_existing_db(db_name: str):
     :param db_name:
     :return sqlite3 connection:
     """
-    conn = sqlite3.connect(db_name)
+    dbExists = True
+    # try to connect to the named db
+    # if it does not exist quit the program
+    try:
+        conn = sqlite3.connect(db_name)
+    except Exception:
+        dbExists = False
+        pass
+    if dbExists == False:   
+        print("Error: Database does not exist", file=sys.stderr)
+        quit()
+        
     cursor = conn.cursor()
     cursor.execute("DROP TABLE Employee")
     cursor.execute("DROP TABLE Record")
@@ -111,7 +123,7 @@ def create_tables(cursor):
          "CREATE TABLE Record (RecordId int, DateTimeIn text, DateTimeOut text)"
     )
     cursor.execute(
-        "CREATE TABLE Pay (PayId int, pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)"
+        "CREATE TABLE Pay (PayId int, Pay unsigned int, BiWeeklyStartDate text, BiWeeklyEndDate text)"
     )
 
 
