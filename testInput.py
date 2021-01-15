@@ -40,9 +40,9 @@ def input_data(args):
 
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO Employee VALUES (2 , 'asdf', 'Dsd')")
-    cursor.execute("INSERT INTO Record VALUES (2, '2020-01-01 08:00:00', '2020-01-01 17:00:00')")
-    cursor.execute("INSERT INTO Pay VALUES (2, 10, '2020-01-01', '2020-01-15')")
+    cursor.execute("INSERT INTO Employee VALUES (1 , 'John', 'Doe')")
+    cursor.execute("INSERT INTO Record VALUES (1, '2020-01-01 08:00:00', '2020-01-01 17:00:00')")
+    cursor.execute("INSERT INTO Pay VALUES (1, 10, '2020-01-01', '2020-01-15')")
     conn.commit()
     conn.close()
 
