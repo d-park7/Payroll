@@ -95,24 +95,12 @@ def delete_existing_db(db_name: str):
     :param db_name:
     :return sqlite3 connection:
     """
-    dbExists = True
-    # try to connect to the named db
-    # if it does not exist quit the program
-    try:
-        conn = sqlite3.connect(db_name)
-    except Exception:
-        dbExists = False
-        pass
-    if dbExists == False:   
+    # try to delete the db file
+    if os.path.exists(db_name):
+            os.remove(db_name)
+    else:
         print("Error: Database does not exist", file=sys.stderr)
         quit()
-        
-    cursor = conn.cursor()
-    cursor.execute("DROP TABLE Employee")
-    cursor.execute("DROP TABLE Record")
-    cursor.execute("DROP TABLE Pay")
-    create_tables(cursor)
-    return conn
 
 
 def create_tables(cursor):
