@@ -4,6 +4,7 @@ import argparse
 import sqlite3
 import datetime
 import pandas as pd
+import sqlalchemy
 import os
 
 
@@ -47,15 +48,24 @@ def calculate_pay(args):
     else:
         conn = sqlite3.connect(db_name)
         SQLQuery = 'SELECT * FROM Record'
+        sqlquery2 = "SELECT * FROM Pay"
         df = pd.read_sql_query(SQLQuery, conn)
+        df2 = pd.read_sql_query(sqlquery2, conn)
+    
 
     if args.calculate:
-        df['DateTimeIn'] = pd.to_datetime(df['DateTimeIn'])
-        df.DateTimeOut = pd.to_datetime(df.DateTimeOut)
-        print(df.loc[0, 'DateTimeIn'].day_name())
-        print(df.loc[0, "DateTimeOut"].day_name())
-        print(df["DateTimeIn"].dt.day_name())
-
+        times_in = pd.Series(df["DateTimeIn"])
+        times_out = pd.Series(df["DateTimeOut"])
+        df["DateTimeIn"] = pd.to_datetime(df["DateTimeIn"])
+        df["DateTimeOut"] = pd.to_datetime(df["DateTimeOut"])
+        hours_worked = (df["DateTimeOut"] - df["DateTimeIn"]).dt.seconds / 3600
+        # insert the hours worked into the DailyWage column in table Record
+        df["DailyWage"] = df2["PayPerHour"] * hours_worked
+        print(df)
+        # create an sqlalchemy for easier connections
+        engine = sqlalchemy.create_engine("sqlite:///{}".format(db_name), echo=False)
+        # replace the old Records table with the new Records dataframe in the db
+        df.to_sql("Record", con=engine, if_exists="replace", index=False)
 
 
 def read_csv_name(db_name: str, csv_name: str):
@@ -109,7 +119,6 @@ def add_filename_extension(datafile: str, file_type: str):
 def main():
     args = parse_args()
     calculate_pay(args)
-    input()
 
 
 if __name__ == "__main__":
