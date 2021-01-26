@@ -51,7 +51,6 @@ def calculate_pay(args):
         sqlquery2 = "SELECT * FROM Pay"
         df = pd.read_sql_query(SQLQuery, conn)
         df2 = pd.read_sql_query(sqlquery2, conn)
-    
 
     if args.calculate:
         times_in = pd.Series(df["DateTimeIn"])
