@@ -1,123 +1,78 @@
 #!/usr/bin/env python3
 
+from initdb import add_filename_extension
 import argparse
 import sqlite3
 import datetime
 import pandas as pd
-import sqlalchemy
 import os
 
 
 def parse_args():
-    # argument parser
-    parser = argparse.ArgumentParser(description="Read from the inputted database")
+    parser = argparse.ArgumentParser(description="Read from the database")
     parser.add_argument(
-        "-d",
+        "-n",
         "--dbname",
         type=str,
         required=True,
         help="Name of db file")
-    parser.add_argument(
-        "-c",
-        "--calculate",
-        action="store_true",
-        help="Calculate the pay based on the time in and time out"
-    )
-    parser.add_argument(
-        "-v",
-        "--csvname",
-        type=str,
-        help="Name of csv file to read"
-    )
 
     args = parser.parse_args()
     return args
 
 
-def calculate_pay(args):
+def create_dataframe(db_name: str, sql_query: str):
     """
-    Calculates data from the database
-    :param args:
-    :return sqlite3 connection:
-    """
-    db_name = add_filename_extension(args.dbname, "db")
-
-    if args.csvname:
-        csv_name = add_filename_extension(args.csvname, "csv")
-        df = read_csv_name(db_name, csv_name)
-    else:
-        conn = sqlite3.connect(db_name)
-        SQLQuery = 'SELECT * FROM Record'
-        sqlquery2 = "SELECT * FROM Pay"
-        df = pd.read_sql_query(SQLQuery, conn)
-        df2 = pd.read_sql_query(sqlquery2, conn)
-
-    if args.calculate:
-        times_in = pd.Series(df["DateTimeIn"])
-        times_out = pd.Series(df["DateTimeOut"])
-        df["DateTimeIn"] = pd.to_datetime(df["DateTimeIn"])
-        df["DateTimeOut"] = pd.to_datetime(df["DateTimeOut"])
-        hours_worked = (df["DateTimeOut"] - df["DateTimeIn"]).dt.seconds / 3600
-        # insert the hours worked into the DailyWage column in table Record
-        df["DailyWage"] = df2["PayPerHour"] * hours_worked
-        print(df)
-        # create an sqlalchemy for easier connections
-        engine = sqlalchemy.create_engine("sqlite:///{}".format(db_name), echo=False)
-        # replace the old Records table with the new Records dataframe in the db
-        df.to_sql("Record", con=engine, if_exists="replace", index=False)
-
-
-def read_csv_name(db_name: str, csv_name: str):
-    """
-    Reads the csv file and converts it into a dataframe format
-    :param csv_name:
+    Creates dataframe to hold data
+    :param db_name:
     :return df:
     """
-    # try to connect to the named db
-    # if it does not eist quit the program
-    dbExists = True
-    try:
-        conn = sqlite3.connect(db_name)
-    except Exception:
-        dbExists = False
-        pass
-    if dbExists == False:
-        print("Error: Datababse does not exist", file=sys.stderr)
-        os.system("PAUSE")
-        quit()
-
-    # accept a csv file name and then put the csv into a dataframe using pandas
+    db_name = add_filename_extension(db_name)
     conn = sqlite3.connect(db_name)
-    df = pd.read_csv(csv_name)
+    df = pd.read_sql(sql_query, conn)
     conn.close()
     return df
 
 
-def add_filename_extension(datafile: str, file_type: str):
+def calculate_pay(df_record, df_pay):
     """
-    Adds the .db or .csv ext if the name does not contain it
-    :param args:
-    :return full_file_name:
+    Calculates daily pay from data in the database
+    :param df_record, df_pay:
+    :return df_record:
     """
-    if file_type == "db":
-        filename, file_extension = os.path.splitext(datafile)
-        if file_extension:
-            full_file_name = datafile
-        else:
-            full_file_name = args.dbname + ".db"
-    elif file_type == "csv":
-        filename, file_extension = os.path.splitext(datafile)
-        if file_extension:
-            full_file_name = datafile
-        else:
-            full_file_name = args.csvname + ".csv"
-            
-    return full_file_name
+    times_in = pd.Series(df_record["DateTimeIn"])
+    times_out = pd.Series(df_record["DateTimeOut"])
+    df_record["DateTimeIn"] = pd.to_datetime(df_record["DateTimeIn"])
+    df_record["DateTimeOut"] = pd.to_datetime(df_record["DateTimeOut"])
+
+    hours_worked = (df_record["DateTimeOut"] - df_record["DateTimeIn"]).dt.seconds / 3600
+    df_record["DailyWage"] = df_pay["PayPerHour"] * hours_worked
+    
+    return df_record
+
+
+# this function currently doesn't do what it needs to do... idky its not working
+def update_database_daily_wage(df_record, db_name: str):
+    conn = sqlite3.connect(db_name)
+    curr = conn.cursor()
+    curr.execute(
+        f'UPDATE Record SET DailyWage = "{df_record.DailyWage}" WHERE RecordId = "{df_record.RecordId}"'
+    )
+    conn.commit()
+    conn.close()
 
 
 def main():
     args = parse_args()
-    calculate_pay(args)
+
+    query_record = "SELECT * FROM Record"
+    query_pay = "SELECT * FROM Pay"
+    df_record = create_dataframe(args.dbname, query_record)
+    df_pay = create_dataframe(args.dbname, query_pay)
+
+    df_record = calculate_pay(df_record, df_pay)
+    print(df_record)
+    update_database_daily_wage(df_record, args.dbname)
 
 
 if __name__ == "__main__":
