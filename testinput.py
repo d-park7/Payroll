@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from initdb import add_filename_extension
 import sqlite3
 import argparse
 import sys
@@ -26,25 +27,30 @@ def input_data(args):
     :return sqlite3 connection:
     """
     db_name = add_filename_extension(args.name)
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO Employee VALUES (1, 'John', 'Doe')")
+    cursor.execute("INSERT INTO Record VALUES (1, '2021-01-01', '09:00:00', '17:00:00')")
+    cursor.execute("INSERT INTO Pay VALUES (1, '2021-01-01', '10')")
+    conn.commit()
+    conn.close()
+
+
+def test_database_connection(db_name: str):
+    """
+    Tests the database connection
+    :param db_name:
+    :return void:
+    """
     dbExists = True
-    # try to connect to the named db
-    # if it does not exist quit the program
     try:
         conn = sqlite3.connect(db_name)
-    except Exception:
+    except Exception as e:
         dbExists = False
         pass
     if dbExists == False:   
         print("Error: Database does not exist", file=sys.stderr)
         quit()
-
-    conn = sqlite3.connect(db_name)
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO Employee VALUES (1, 'John', 'Doe')")
-    cursor.execute("INSERT INTO Record VALUES (1, '2021-01-01 08:00:00', '2021-01-01 17:00:00')")
-    cursor.execute("INSERT INTO Pay VALUES (1, 10, '2021-01-01', '2021-01-15')")
-    conn.commit()
-    conn.close()
 
 
 def add_filename_extension(db_name: str):
