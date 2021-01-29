@@ -1,2 +1,2 @@
 # Pay-Clock
-updated the database with a python file that will create the .db file using sqlite3
+01/28/2021 - Enhanced the functional and logical structure of the relational database itself.
