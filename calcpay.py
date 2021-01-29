@@ -6,6 +6,7 @@ import datetime
 import pandas as pd
 import sqlalchemy
 import os
+import sys
 
 
 def parse_args():
