@@ -21,9 +21,9 @@ calcpay.py - Calculates wages for a specific employee during a time period.
 3. Run the following commands:
   - python initdb.py -n payroll.db 
   - python testinput.py -n payroll.db
-  - python calcpay.py -n payroll.db -i <employee-id> -f <start-date> -l <end-date>
+  - python calcpay.py -n payroll.db -i \<employee-id\> -f \<start-date\> -l \<end-date\>
   
-Note: <start-date> and <end-date> format: 'YYYY-MM-DD'
+Note: \<start-date\> and \<end-date\> format: 'YYYY-MM-DD'
 
 ## Additional Notes
 
