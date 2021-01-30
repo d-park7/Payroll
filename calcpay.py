@@ -18,11 +18,11 @@ def parse_args():
         required=True,
         help="Name of db file")
     parser.add_argument(
-        "-e",
-        "--empname",
-        type=str,
+        "-i",
+        "--employee_id",
+        type=int,
         required=True,
-        help="First and last name of the employee"
+        help="Employee specific ID"
     )
     parser.add_argument(
         "-f",
@@ -55,38 +55,37 @@ def create_dataframe(db_name: str, sql_query: str):
     return df
 
 
-def calculate_pay(employee_name:str, start_date: str, end_date:str, df_employee, df_record, df_pay):
-    """
-    Calculates daily pay from data in the database
-    :param employee_name, start_date, end_date, df_employee, df_record, df_pay:
+def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, df_record, df_pay):
+    """ Calculates daily pay from data in the database
+    
+    :param start_date, end_date, df_employee, df_record, df_pay:
     :return wage:
     """
-    df_merged = df_pay.merge(df_record, how='left', on=["EmployeeId", "Date"])
+    df_merged = df_pay.merge(df_record, how='inner', on=['EmployeeId', 'Date'])
 
-    employee_name = employee_name.split()
-    first_name = employee_name[0]
-    last_name = employee_name[1]
+    # Getting employee's first + last name based on id
+    selected_row = df_employee.loc[df_employee['EmployeeId'] == employee_id]
+    first_name = selected_row['FirstName'][0]
+    last_name = selected_row['LastName'][0]
 
-    # can't think of solution here...
-    for fname in df_employee.FirstName:
-        if df_employee.FirstName.loc[fname] == first_name:
-            employee_id = df_employee.loc[df_employee.FirstName == fname, "EmployeeId"].values[0]
-    for lname in df_employee.LastName:
-        if df_employee.LastName.loc[lname] == last_name:
-            employee_id = df_employee.loc[df_employee.LastName == lname, "EmployeeId"].values[0]
-
+    # Date worked and time in & out
     df_merged.Date = pd.to_datetime(df_merged.Date)
     df_merged.TimeIn = pd.to_datetime(df_merged.TimeIn)
     df_merged.TimeOut = pd.to_datetime(df_merged.TimeOut)
 
+    # Dates inputted by user to calculate
     first_date = pd.to_datetime(start_date, format="%Y-%m-%d")
     last_date = pd.to_datetime(end_date, format="%Y-%m-%d")
-
+    
+    # Checks if the worked dates fall between the selected start and end date. Also check if employee id matches
+    # NOTE: Using binary (&) operator to make comparison between datetime.timestamp and datetime64
+    #  - Returns a parallel dataframe with true/false that show if the row in df_merged matches
     mask = ((df_merged.Date >= first_date) & (df_merged.Date <= last_date)) & (df_merged.EmployeeId == employee_id)
     df_merged = df_merged.loc[mask]
 
-    wage = ((df_merged.TimeOut- df_merged.TimeIn).dt.seconds / 3600) * df_merged.PayPerHour
-    return df_merged, wage
+    # Calculate total wage for employee
+    df_wage = ((df_merged.TimeOut- df_merged.TimeIn).dt.seconds / 3600) * df_merged.PayPerHour
+    return df_merged, df_wage.sum()
 
 
 def main():
@@ -99,10 +98,9 @@ def main():
     df_record = create_dataframe(args.dbname, query_record)
     df_pay = create_dataframe(args.dbname, query_pay)
 
-    df_merged, wage = calculate_pay(args.empname, args.firstday, args.lastday, df_employee, df_record, df_pay)
-    print(df_merged)
-    print(wage)
-
+    df_merged, wage = calculate_pay(args.employee_id, args.firstday, args.lastday, df_employee, df_record, df_pay)
+    print(f'df_merged: \n{df_merged}\n===================')
+    print(f'wage: ${wage:.2f}')
 
 if __name__ == "__main__":
     main()

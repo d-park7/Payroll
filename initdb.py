@@ -29,15 +29,18 @@ def parse_args():
 def init_db(args):
     db_name = add_filename_extension(args.name)
 
-    if args.create:
-        conn = create_new_db(db_name)
+    conn = create_new_db(db_name)
+    
+    # if args.create:
+    #     conn = create_new_db(db_name)
+
     if args.override:
         delete_existing_db(db_name)
         conn = create_new_db(db_name)
 
-    if conn.total_changes != 0:
-        print("Failed to create database.", file=sys.stderr)
-        quit()
+    # if conn.total_changes != 0:
+    #     print("Failed to create database.", file=sys.stderr)
+    #     quit()
 
     conn.commit()
     conn.close()
@@ -50,7 +53,7 @@ def create_new_db(db_name: str):
     :param db_name:
     :return sqlite3 connection:
     """
-    test_database_connection(db_name)
+    # test_database_connection(db_name)
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     create_tables(cursor)
@@ -73,14 +76,15 @@ def delete_existing_db(db_name: str):
 
 def create_tables(cursor):
     cursor.execute(
-        "CREATE TABLE Employee (EmployeeId INTEGER PRIMARY KEY, FirstName TEXT, LastName TEXT)"
+        "CREATE TABLE IF NOT EXISTS Employee (EmployeeId INTEGER PRIMARY KEY, FirstName TEXT, LastName TEXT)"
     )
     cursor.execute(
-         "CREATE TABLE Record (EmployeeId INTEGER, Date TEXT, TimeIn TEXT, TimeOut TEXT, FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
+         "CREATE TABLE IF NOT EXISTS Record (EmployeeId INTEGER, Date TEXT, TimeIn TEXT, TimeOut TEXT, PRIMARY KEY(EmployeeId, Date, TimeIn, TimeOut), FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
     )
     cursor.execute(
-        "CREATE TABLE Pay (EmployeeId INTEGER, Date TEXT, PayPerHour UNSIGNED FLOAT, FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
+        "CREATE TABLE IF NOT EXISTS Pay (EmployeeId INTEGER, Date TEXT, PayPerHour UNSIGNED FLOAT, PRIMARY KEY(EmployeeId, Date), FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
     )
+
 
 
 def test_database_connection(db_name: str):
@@ -97,7 +101,7 @@ def test_database_connection(db_name: str):
         pass
     if dbExists == True:
         print("Error: Database already exists", file=sys.stderr)
-        quit()
+        # quit()
 
 
 def add_filename_extension(db_name: str):
