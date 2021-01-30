@@ -27,28 +27,31 @@ def parse_args():
 
 
 def init_db(args):
+    """
+    Creates the database.
+    :param args:
+    :type args: argparse.Namespace
+    :return void:
+    """
     db_name = add_filename_extension(args.name)
 
     if args.create:
         conn = create_new_db(db_name)
+
     if args.override:
         delete_existing_db(db_name)
         conn = create_new_db(db_name)
 
-    if conn.total_changes != 0:
-        print("Failed to create database.", file=sys.stderr)
-        quit()
-
     conn.commit()
     conn.close()
-    return
 
 
 def create_new_db(db_name: str):
     """
     Creates a new database if not already made
     :param db_name:
-    :return sqlite3 connection:
+    :type db_name: string
+    :return sqlite3.Connection:
     """
     test_database_connection(db_name)
     conn = sqlite3.connect(db_name)
@@ -59,11 +62,11 @@ def create_new_db(db_name: str):
 
 def delete_existing_db(db_name: str):
     """
-    Deletes existing db and replaces it
+    Deletes the existing database
     :param db_name:
-    :return sqlite3 connection:
+    :type db_name: string
+    :return void:
     """
-    # try to delete the db file
     if os.path.exists(db_name):
             os.remove(db_name)
     else:
@@ -73,20 +76,22 @@ def delete_existing_db(db_name: str):
 
 def create_tables(cursor):
     cursor.execute(
-        "CREATE TABLE Employee (EmployeeId int, FirstName text, LastName text)"
+        "CREATE TABLE IF NOT EXISTS Employee (EmployeeId INTEGER PRIMARY KEY, FirstName TEXT, LastName TEXT)"
     )
     cursor.execute(
-         "CREATE TABLE Record (RecordId int, DateTimeIn text, DateTimeOut text, DailyWage unsigned float)"
+         "CREATE TABLE IF NOT EXISTS Record (EmployeeId INTEGER, Date TEXT, TimeIn TEXT, TimeOut TEXT, PRIMARY KEY(EmployeeId, Date, TimeIn, TimeOut), FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
     )
     cursor.execute(
-        "CREATE TABLE Pay (PayId int, PayPerHour unsigned float, BiWeeklyStartDate text, BiWeeklyEndDate text)"
+        "CREATE TABLE IF NOT EXISTS Pay (EmployeeId INTEGER, Date TEXT, PayPerHour UNSIGNED FLOAT, PRIMARY KEY(EmployeeId, Date), FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
     )
+
 
 
 def test_database_connection(db_name: str):
     """
     Tests the database connection
     :param db_name:
+    :type db_name: string
     :return void:
     """
     dbExists = True
@@ -97,14 +102,17 @@ def test_database_connection(db_name: str):
         pass
     if dbExists == True:
         print("Error: Database already exists", file=sys.stderr)
-        quit()
 
 
 def add_filename_extension(db_name: str):
     """
     Adds the .db ext if the name does not contain it
     :param db_name:
-    :return:
+    :type db_name: string
+    :return db_name:
+    :rtype string:
+    :return filename + ".db":
+    :rtype string:
     """
     filename, file_extension = os.path.splitext(db_name)
     if file_extension:
