@@ -23,8 +23,9 @@ def parse_args():
 def input_data(args):
     """
     Inputs test data into the database
-    :param db_name:
-    :return sqlite3 connection:
+    :param args:
+    :type args: argparse.Namespace
+    :return void:
     """
     db_name = add_filename_extension(args.name)
     conn = sqlite3.connect(db_name)
@@ -52,6 +53,7 @@ def test_database_connection(db_name: str):
     """
     Tests the database connection
     :param db_name:
+    :type db_name: string
     :return void:
     """
     dbExists = True
@@ -69,7 +71,11 @@ def add_filename_extension(db_name: str):
     """
     Adds the .db ext if the name does not contain it
     :param db_name:
-    :return:
+    :type db_name: string
+    :return db_name:
+    :rtype db_name: string
+    :return filename + ".db":
+    :rtype filename + ".db": string
     """
     filename, file_extension = os.path.splitext(db_name)
     if file_extension:
