@@ -17,7 +17,27 @@ def parse_args():
         type=str,
         required=True,
         help="Name of db file")
-
+    parser.add_argument(
+        "-e",
+        "--empname",
+        type=str,
+        required=True,
+        help="First and last name of the employee"
+    )
+    parser.add_argument(
+        "-f",
+        "--firstday",
+        type=str,
+        required=True,
+        help="Starting date to calculate pay"
+    )
+    parser.add_argument(
+        "-l",
+        "--lastday",
+        type=str,
+        required=True,
+        help="Ending date to calculate pay"
+    )
     args = parser.parse_args()
     return args
 
@@ -35,45 +55,53 @@ def create_dataframe(db_name: str, sql_query: str):
     return df
 
 
-def calculate_pay(df_record, df_pay):
+def calculate_pay(employee_name:str, start_date: str, end_date:str, df_employee, df_record, df_pay):
     """
     Calculates daily pay from data in the database
-    :param df_record, df_pay:
-    :return df_record:
+    :param employee_name, start_date, end_date, df_employee, df_record, df_pay:
+    :return wage:
     """
-    times_in = pd.Series(df_record["DateTimeIn"])
-    times_out = pd.Series(df_record["DateTimeOut"])
-    df_record["DateTimeIn"] = pd.to_datetime(df_record["DateTimeIn"])
-    df_record["DateTimeOut"] = pd.to_datetime(df_record["DateTimeOut"])
+    df_merged = df_pay.merge(df_record, how='left', on=["EmployeeId", "Date"])
 
-    hours_worked = (df_record["DateTimeOut"] - df_record["DateTimeIn"]).dt.seconds / 3600
-    df_record["DailyWage"] = df_pay["PayPerHour"] * hours_worked
-    
-    return df_record
+    employee_name = employee_name.split()
+    first_name = employee_name[0]
+    last_name = employee_name[1]
 
+    # can't think of solution here...
+    for fname in df_employee.FirstName:
+        if df_employee.FirstName.loc[fname] == first_name:
+            employee_id = df_employee.loc[df_employee.FirstName == fname, "EmployeeId"].values[0]
+    for lname in df_employee.LastName:
+        if df_employee.LastName.loc[lname] == last_name:
+            employee_id = df_employee.loc[df_employee.LastName == lname, "EmployeeId"].values[0]
 
-# this function currently doesn't do what it needs to do... idky its not working
-def update_database_daily_wage(df_record, db_name: str):
-    conn = sqlite3.connect(db_name)
-    curr = conn.cursor()
-    curr.execute(
-        f'UPDATE Record SET DailyWage = "{df_record.DailyWage}" WHERE RecordId = "{df_record.RecordId}"'
-    )
-    conn.commit()
-    conn.close()
+    df_merged.Date = pd.to_datetime(df_merged.Date)
+    df_merged.TimeIn = pd.to_datetime(df_merged.TimeIn)
+    df_merged.TimeOut = pd.to_datetime(df_merged.TimeOut)
+
+    first_date = pd.to_datetime(start_date, format="%Y-%m-%d")
+    last_date = pd.to_datetime(end_date, format="%Y-%m-%d")
+
+    mask = ((df_merged.Date >= first_date) & (df_merged.Date <= last_date)) & (df_merged.EmployeeId == employee_id)
+    df_merged = df_merged.loc[mask]
+
+    wage = ((df_merged.TimeOut- df_merged.TimeIn).dt.seconds / 3600) * df_merged.PayPerHour
+    return df_merged, wage
 
 
 def main():
     args = parse_args()
 
+    query_employee = "SELECT * FROM Employee"
     query_record = "SELECT * FROM Record"
     query_pay = "SELECT * FROM Pay"
+    df_employee = create_dataframe(args.dbname, query_employee)
     df_record = create_dataframe(args.dbname, query_record)
     df_pay = create_dataframe(args.dbname, query_pay)
 
-    df_record = calculate_pay(df_record, df_pay)
-    print(df_record)
-    update_database_daily_wage(df_record, args.dbname)
+    df_merged, wage = calculate_pay(args.empname, args.firstday, args.lastday, df_employee, df_record, df_pay)
+    print(df_merged)
+    print(wage)
 
 
 if __name__ == "__main__":
