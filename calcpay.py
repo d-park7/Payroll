@@ -65,8 +65,8 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
 
     # Getting employee's first + last name based on id
     selected_row = df_employee.loc[df_employee['EmployeeId'] == employee_id]
-    first_name = selected_row['FirstName'][0]
-    last_name = selected_row['LastName'][0]
+    first_name = selected_row['FirstName'][employee_id-1]
+    last_name = selected_row['LastName'][employee_id-1]
 
     # Date worked and time in & out
     df_merged.Date = pd.to_datetime(df_merged.Date)
