@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# Trying to learn git with the cli
 from initdb import add_filename_extension
 import argparse
 import sqlite3
