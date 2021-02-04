@@ -1,5 +1,3 @@
 .idea/
 *.db
 __pycache__/
-test_calcpay.py
-test_initdb.py
