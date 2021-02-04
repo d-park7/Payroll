@@ -42,8 +42,9 @@ def init_db(args):
         delete_existing_db(db_name)
         conn = create_new_db(db_name)
 
-    conn.commit()
-    conn.close()
+    if args.create == True or args.override == True:
+        conn.commit()
+        conn.close()
 
 
 def create_new_db(db_name: str):
@@ -53,7 +54,6 @@ def create_new_db(db_name: str):
     :type db_name: string
     :return sqlite3.Connection:
     """
-    test_database_connection(db_name)
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     create_tables(cursor)
@@ -84,24 +84,6 @@ def create_tables(cursor):
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS Pay (EmployeeId INTEGER, Date TEXT, PayPerHour UNSIGNED FLOAT, PRIMARY KEY(EmployeeId, Date), FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
     )
-
-
-
-def test_database_connection(db_name: str):
-    """
-    Tests the database connection
-    :param db_name:
-    :type db_name: string
-    :return void:
-    """
-    dbExists = True
-    try:
-        conn = sqlite3.connect("file:{}?mode=rw".format(db_name), uri=True)
-    except Exception as e:
-        dbExists = False
-        pass
-    if dbExists == True:
-        print("Error: Database already exists", file=sys.stderr)
 
 
 def add_filename_extension(db_name: str):

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# Trying to learn git with the cli
 from initdb import add_filename_extension
 import argparse
 import sqlite3
@@ -92,24 +91,25 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
 
     # Calculate total wage for employee
     df_wage = ((df_merged.TimeOut - df_merged.TimeIn).dt.seconds / 3600) * df_merged.PayPerHour
-    return df_merged, df_wage.sum()
+    return df_wage.sum()
 
 
 def main():
     logging.basicConfig(filename="calcpay.log", level=logging.INFO)
     logging.info("Started")
-    args = parse_args()
 
+    args = parse_args()
     query_employee = "SELECT * FROM Employee"
     query_record = "SELECT * FROM Record"
     query_pay = "SELECT * FROM Pay"
     df_employee = sql_to_dataframe(args.dbname, query_employee)
     df_record = sql_to_dataframe(args.dbname, query_record)
     df_pay = sql_to_dataframe(args.dbname, query_pay)
+    wage = calculate_pay(args.employee_id, args.firstday, args.lastday, df_employee, df_record, df_pay)
+    
+    logging.info(f"wage: ${wage:.2f}")
+    logging.info("Ended\n================")
 
-    df_merged, wage = calculate_pay(args.employee_id, args.firstday, args.lastday, df_employee, df_record, df_pay)
-    logging.info(f'df_merged: \n{df_merged}\n===================')
-    logging.info(f'wage: ${wage:.2f}')
-    logging.info("Ended")
+
 if __name__ == "__main__":
     main()
