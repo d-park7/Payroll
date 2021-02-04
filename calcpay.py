@@ -97,17 +97,19 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
 def main():
     logging.basicConfig(filename="calcpay.log", level=logging.INFO)
     logging.info("Started")
-    args = parse_args()
 
+    args = parse_args()
     query_employee = "SELECT * FROM Employee"
     query_record = "SELECT * FROM Record"
     query_pay = "SELECT * FROM Pay"
     df_employee = sql_to_dataframe(args.dbname, query_employee)
     df_record = sql_to_dataframe(args.dbname, query_record)
     df_pay = sql_to_dataframe(args.dbname, query_pay)
-
     wage = calculate_pay(args.employee_id, args.firstday, args.lastday, df_employee, df_record, df_pay)
-    logging.info(f'wage: ${wage:.2f}')
-    logging.info("Ended")
+    
+    logging.info(f"wage: ${wage:.2f}")
+    logging.info("Ended\n================")
+
+
 if __name__ == "__main__":
     main()
