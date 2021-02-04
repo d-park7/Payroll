@@ -1,4 +1,6 @@
-<<<<<<< Test-Branch
+# Payroll
+A payroll program that lets employees clock in and out and then calculates a biweekly paycheck based on the times and wage.
+
 TO USE THIS:
 1. First initialize your database with the initdb.py file.
 2. Put in the test information with testinput.py.
@@ -31,7 +33,3 @@ Note: \<start-date\> and \<end-date\> format: 'YYYY-MM-DD'
 You may need to run: 
 
 - pip install pandas
-=======
-# Payroll
-A payroll program that lets employees clock in and out and then calculates a biweekly paycheck based on the times and wage.
->>>>>>> main
