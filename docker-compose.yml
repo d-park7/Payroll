@@ -1,0 +1,18 @@
+# Specify intial version
+version: '3.8'
+
+# First service is payroll container (flask + SQLite)
+services:
+  payroll:
+    container_name: payroll
+
+    # Runs Dockerfile build in the current directory
+    build:
+      context: ./
+
+    # Name of the payroll image with version
+    image: payroll:latest
+
+    # Exposes host port to container port for communication
+    ports:
+      - 5000:5000

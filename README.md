@@ -18,12 +18,20 @@ testinput.py - Loads the db tables with test data
 
 calcpay.py - Calculates wages for a specific employee during a time period.
 
+## Setup
+1. Download Docker desktop (verify your installation using "docker -v")
+2. For windows: Download and enable WSL 2 
+
 ## Usage
 1. Clone project to desired directory (or download .zip and extract)
 2. Navigate to directory where .py files are located
 3. Run the following commands:
-  - python initdb.py -n payroll.db 
-  - python testinput.py -n payroll.db
+  - **docker-compose build** (this will take a bit for the first time)
+  - **docker-compose up** (This will start the container)
+4. In your browser, open up **localhost:5000** (You should be able to see some text)
+
+## Features
+1. Run the following commands (if you want):
   - python calcpay.py -n payroll.db -i \<employee-id\> -f \<start-date\> -l \<end-date\>
   
 Note: \<start-date\> and \<end-date\> format: 'YYYY-MM-DD'
