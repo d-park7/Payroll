@@ -16,3 +16,6 @@ services:
     # Exposes host port to container port for communication
     ports:
       - 5000:5000
+
+    volumes: 
+      - ./:/app
