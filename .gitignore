@@ -3,3 +3,4 @@
 __pycache__/
 .vscode/
 calcpay.log
+node_modules
