@@ -1,0 +1,24 @@
+<html lang="en">
+<head>
+    <!-- Add css part of bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+    {% block title %} {% endblock %}
+</head>
+<body>
+
+    <!-- Navbar with a form inside -->
+    <nav class="navbar navbar-light bg-light">
+        <form class="form-inline">
+          <input class="form-control form-control-lg mr-sm-2" type="search" placeholder="Employee ID" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </nav>
+    
+    {% block content %}
+    {% endblock %}
+
+    <!-- Add JS part of bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+</body>
+</html>
