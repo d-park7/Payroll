@@ -1,3 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Home Page{% endblock %}
-{% block content %} {% endblock %}
+{% block title %}Home Page (Search for employee by id){% endblock %}
+{% block content %} 
+
+    <!-- Set POST request when submitting employee ID -->
+    <form action='#' method="POST">
+        <p>
+            <input type="text" placeholder="Employee ID" name="employee_id"/>
+            <button type="submit" class="btn btn-success">Success</button>
+        </p>
+    </form>
+{% endblock %}
