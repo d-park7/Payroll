@@ -14,9 +14,5 @@ COPY . .
 # Install required packages for the project
 RUN pip install -r requirements.txt
 
-# Initialize database and insert test data
-RUN python initdb.py -n payroll.db -c
-RUN python testinput.py -n payroll.db
-
 # Start flask server
 CMD [ "python", "app.py" ]
