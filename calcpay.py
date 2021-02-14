@@ -4,6 +4,7 @@ from initdb import add_filename_extension
 import argparse
 import sqlite3
 import datetime
+import time
 import pandas as pd
 import os
 import sys
@@ -54,6 +55,31 @@ def sql_to_dataframe(db_name: str, sql_query: str):
     return df
 
 
+def convert_db_to_easier_calculations(df_record):
+    """
+    Changes the record dataframe into one that is more managable to calculate the pay.
+    To be used in the calculate_pay function.
+    Assumptions: Times are in order for each given date
+
+    :param df_record: the record dataframe from the database
+    :type df_record: pandas.Dataframe
+    :return df_record: modified record dataframe
+    :rtype df_record: pandas.Dataframe
+    """
+    timein_mask = df_record.TimeInFlag == 1
+    timeout_mask = df_record.TimeInFlag == 0
+    df_timein = df_record.loc[timein_mask]
+    df_timeout = df_record.loc[timeout_mask]
+
+    df_timein.reset_index(inplace=True, drop=True)
+    df_timeout.reset_index(inplace=True, drop=True)
+
+    df_record = df_timein.merge(df_timeout, how='inner', on=[df_timeout.index, 'Date', 'EmployeeId'])
+    df_record.drop(columns=['TimeInFlag_x', 'TimeInFlag_y', 'key_0'], axis='columns', inplace=True)
+    df_record.rename(columns={'Time_x': 'TimeIn', 'Time_y': 'TimeOut'}, inplace=True)
+    return df_record
+
+
 def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, df_record, df_pay):
     """ 
     Calculates employee pay from chosen data form the database.
@@ -64,22 +90,22 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
     :type start_date: string
     :param end_date: the date you want to calculate the employee's pay to (inclusive)
     :type end_date: string
-    :df_record: a dataframe of the Record table from the databse
-    :df_employee: created dataframe of the Employee table
-    :df_pay: created dataframe of the Pay table
-    :return df_merged: the merged dataframe of the calculated daily wages from df_pay and df_record 
-    :rtype df_merged: pandas.dataframe (for debugging purposes)
+    :param df_employee: created dataframe of the Employee table
+    :type df_employee: pandas.Dataframe
+    :param df_record: a dataframe of the Record table from the database
+    :type df_record: pandas.Dataframe
+    :param df_pay: created dataframe of the Pay table
+    :type df_pay: pandas.Dataframe
     :return df_wage.sum(): the total wage for the employee from the chosen dates
     :rtype df_wage.sum(): numpy.float64
     """
+    df_record = convert_db_to_easier_calculations(df_record)
     df_merged = df_pay.merge(df_record, how='inner', on=['EmployeeId', 'Date'])
 
-    # Date worked and time in & out
     df_merged.Date = pd.to_datetime(df_merged.Date)
     df_merged.TimeIn = pd.to_datetime(df_merged.TimeIn)
     df_merged.TimeOut = pd.to_datetime(df_merged.TimeOut)
 
-    # Dates inputted by user to calculate
     first_date = pd.to_datetime(start_date, format="%Y-%m-%d")
     last_date = pd.to_datetime(end_date, format="%Y-%m-%d")
     
@@ -89,7 +115,6 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
     mask = ((df_merged.Date >= first_date) & (df_merged.Date <= last_date)) & (df_merged.EmployeeId == employee_id)
     df_merged = df_merged.loc[mask]
 
-    # Calculate total wage for employee
     df_wage = ((df_merged.TimeOut - df_merged.TimeIn).dt.seconds / 3600) * df_merged.PayPerHour
     return df_wage.sum()
 

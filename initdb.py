@@ -35,8 +35,7 @@ def init_db(args):
     """
     db_name = add_filename_extension(args.name)
 
-    if args.create:
-        conn = create_new_db(db_name)
+    conn = create_new_db(db_name)
 
     if args.override:
         delete_existing_db(db_name)
@@ -79,10 +78,10 @@ def create_tables(cursor):
         "CREATE TABLE IF NOT EXISTS Employee (EmployeeId INTEGER PRIMARY KEY, FirstName TEXT, LastName TEXT)"
     )
     cursor.execute(
-         "CREATE TABLE IF NOT EXISTS Record (EmployeeId INTEGER, Date TEXT, TimeIn TEXT, TimeOut TEXT, PRIMARY KEY(EmployeeId, Date, TimeIn, TimeOut), FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
+        "CREATE TABLE IF NOT EXISTS Pay (EmployeeId INTEGER, Date TEXT, PayPerHour UNSIGNED FLOAT, PRIMARY KEY(EmployeeId, Date), FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
     )
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS Pay (EmployeeId INTEGER, Date TEXT, PayPerHour UNSIGNED FLOAT, PRIMARY KEY(EmployeeId, Date), FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
+         "CREATE TABLE IF NOT EXISTS Record (EmployeeId INTEGER, Date TEXT, Time TEXT, TimeInFlag INT, PRIMARY KEY(EmployeeId, Date, Time, TimeInFlag), FOREIGN KEY(EmployeeId) REFERENCES Employee(EmployeeId))"
     )
 
 
