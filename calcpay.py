@@ -102,12 +102,10 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
     df_record = convert_db_to_easier_calculations(df_record)
     df_merged = df_pay.merge(df_record, how='inner', on=['EmployeeId', 'Date'])
 
-    # Date worked and time in & out
     df_merged.Date = pd.to_datetime(df_merged.Date)
     df_merged.TimeIn = pd.to_datetime(df_merged.TimeIn)
     df_merged.TimeOut = pd.to_datetime(df_merged.TimeOut)
 
-    # Dates inputted by user to calculate
     first_date = pd.to_datetime(start_date, format="%Y-%m-%d")
     last_date = pd.to_datetime(end_date, format="%Y-%m-%d")
     
@@ -117,7 +115,6 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
     mask = ((df_merged.Date >= first_date) & (df_merged.Date <= last_date)) & (df_merged.EmployeeId == employee_id)
     df_merged = df_merged.loc[mask]
 
-    # Calculate total wage for employee
     df_wage = ((df_merged.TimeOut - df_merged.TimeIn).dt.seconds / 3600) * df_merged.PayPerHour
     return df_wage.sum()
 
