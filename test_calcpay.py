@@ -58,4 +58,8 @@ class TestCalcPay(unittest.TestCase):
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     unittest.main()
+=======
+    unittest.main()
+>>>>>>> d4a9a67e17c1274c211686471747260e2c0751ce
