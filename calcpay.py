@@ -67,8 +67,8 @@ def convert_db_to_easier_calculations(df_record):
     :rtype df_record: pandas.Dataframe
     """
     # first separate dataframe into 2, 1 with timein and 1 with timeout
-    timein_mask = df_record.TimeInFlag == 0
-    timeout_mask = df_record.TimeInFlag == 1
+    timein_mask = df_record.TimeInFlag == 1
+    timeout_mask = df_record.TimeInFlag == 0
     df_timein = df_record.loc[timein_mask]
     df_timeout = df_record.loc[timeout_mask]
 
@@ -77,7 +77,7 @@ def convert_db_to_easier_calculations(df_record):
     df_timeout.reset_index(inplace=True, drop=True)
 
     # now join the two dataframes into df_record and drop unnecessary columns and change the column names
-    df_record = df_timeout.merge(df_timein, how='inner', on=[df_timeout.index, 'Date', 'EmployeeId'])
+    df_record = df_timein.merge(df_timeout, how='inner', on=[df_timeout.index, 'Date', 'EmployeeId'])
     df_record.drop(columns=['TimeInFlag_x', 'TimeInFlag_y', 'key_0'], axis='columns', inplace=True)
     df_record.rename(columns={'Time_x': 'TimeIn', 'Time_y': 'TimeOut'}, inplace=True)
     return df_record
