@@ -66,17 +66,14 @@ def convert_db_to_easier_calculations(df_record):
     :return df_record: modified record dataframe
     :rtype df_record: pandas.Dataframe
     """
-    # first separate dataframe into 2, 1 with timein and 1 with timeout
     timein_mask = df_record.TimeInFlag == 1
     timeout_mask = df_record.TimeInFlag == 0
     df_timein = df_record.loc[timein_mask]
     df_timeout = df_record.loc[timeout_mask]
 
-    # then reset the indexes to start from 0 to n rows
     df_timein.reset_index(inplace=True, drop=True)
     df_timeout.reset_index(inplace=True, drop=True)
 
-    # now join the two dataframes into df_record and drop unnecessary columns and change the column names
     df_record = df_timein.merge(df_timeout, how='inner', on=[df_timeout.index, 'Date', 'EmployeeId'])
     df_record.drop(columns=['TimeInFlag_x', 'TimeInFlag_y', 'key_0'], axis='columns', inplace=True)
     df_record.rename(columns={'Time_x': 'TimeIn', 'Time_y': 'TimeOut'}, inplace=True)
@@ -119,23 +116,6 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
     #  - Returns a parallel dataframe with true/false that show if the row in df_merged matches
     mask = ((df_merged.Date >= first_date) & (df_merged.Date <= last_date)) & (df_merged.EmployeeId == employee_id)
     df_merged = df_merged.loc[mask]
-
-    # Calculate total wage for employee
-    df_wage = ((df_merged.TimeOut - df_merged.TimeIn).dt.seconds / 3600) * df_merged.PayPerHour
-    return df_wage.sum()
-
-
-    # Dates inputted by user to calculate
-    first_date = pd.to_datetime(start_date, format="%Y-%m-%d")
-    last_date = pd.to_datetime(end_date, format="%Y-%m-%d")
-    
-    # Checks if the worked dates fall between the selected start and end date. Also check if employee id matches
-    # NOTE: Using binary (&) operator to make comparison between datetime.timestamp and datetime64
-    #  - Returns a parallel dataframe with true/false that show if the row in df_merged matches
-    mask = ((df_merged.Date >= first_date) & (df_merged.Date <= last_date)) & (df_merged.EmployeeId == employee_id)
-    print(mask)
-    df_merged = df_merged.loc[mask]
-    print(df_merged)
 
     # Calculate total wage for employee
     df_wage = ((df_merged.TimeOut - df_merged.TimeIn).dt.seconds / 3600) * df_merged.PayPerHour
