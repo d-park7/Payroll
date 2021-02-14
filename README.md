@@ -20,7 +20,8 @@ calcpay.py - Calculates wages for a specific employee during a time period.
 
 ## Setup
 1. Download Docker desktop (verify your installation using "docker -v")
-2. For windows: Download and enable WSL 2 
+2. Download Docker Compose
+3. For windows: Download and enable WSL 2 
 
 ## Usage
 1. Clone project to desired directory (or download .zip and extract)
