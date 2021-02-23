@@ -1,5 +1,5 @@
 # Specify intial version
-version: '3.8'
+version: '3.3'
 
 # First service is payroll container (flask + SQLite)
 services:
