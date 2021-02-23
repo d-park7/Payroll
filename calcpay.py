@@ -139,10 +139,8 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
     df_merged.Date = pd.to_datetime(df_merged.Date)
     df_merged.TimeIn = pd.to_datetime(df_merged.TimeIn)
     df_merged.TimeOut = pd.to_datetime(df_merged.TimeOut)
-    print(type(df_merged.TimeIn.dt))
 
     first_date = pd.to_datetime(start_date, infer_datetime_format=True)
-    print(type(first_date))
     last_date = pd.to_datetime(end_date, infer_datetime_format=True)
 
     # Checks if the worked dates fall between the selected start and end date. Also check if employee id matches
