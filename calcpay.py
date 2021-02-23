@@ -80,6 +80,40 @@ def convert_db_to_easier_calculations(df_record):
     return df_record
 
 
+def calculate_overtime(df_merged, regular_hours_limit: int):
+    """
+    Calculates the overtime pay if necessary. Overtime is given if the weekly hours exceed 40.
+    Overtime pay is 1.5 * normal pay.
+    
+    :param df_merged: the merged dataframe of pay and record dataframes
+    :type df_merged: pandas.Dataframe
+    :param regular_hours_limit: number of hours before overtime begins
+    :type regular_hours_limit: int
+    :return wage: the calculated total wage
+    :rtype wage: numpy.float64
+    """
+    df_hours_worked = (df_merged.TimeOut - df_merged.TimeIn).dt.seconds / 3600
+
+    if df_hours_worked.sum() > regular_hours_limit:
+        # Locates the index where regular hour limit <= hours worked
+        overtime_index = pd.Index(df_hours_worked.cumsum()).get_loc(regular_hours_limit, "pad")
+        df_regular_pay = df_hours_worked.loc[:overtime_index] * df_merged.PayPerHour.loc[:overtime_index]
+        hours_overtime = df_hours_worked.sum() - regular_hours_limit
+
+        # Splits the index that contains both regular hours and overtime hours
+        split_regular_time = regular_hours_limit - df_hours_worked.loc[:overtime_index].sum()
+        split_overtime = df_hours_worked.loc[overtime_index+1] - split_regular_time
+
+        end_index = len(df_hours_worked.index)
+        df_overtime_wage = df_merged.PayPerHour.iloc[overtime_index + 1:end_index] * 1.5
+
+        wage = df_regular_pay.sum() + (split_regular_time * df_merged.PayPerHour.loc[overtime_index + 1])
+        wage += split_overtime * df_merged.PayPerHour.loc[overtime_index+1] * 1.5
+        wage += (df_hours_worked.iloc[overtime_index+2:end_index] * df_overtime_wage).sum()
+
+    return wage
+    
+
 def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, df_record, df_pay):
     """ 
     Calculates employee pay from chosen data form the database.
@@ -105,18 +139,25 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
     df_merged.Date = pd.to_datetime(df_merged.Date)
     df_merged.TimeIn = pd.to_datetime(df_merged.TimeIn)
     df_merged.TimeOut = pd.to_datetime(df_merged.TimeOut)
+    print(type(df_merged.TimeIn.dt))
 
-    first_date = pd.to_datetime(start_date, format="%Y-%m-%d")
-    last_date = pd.to_datetime(end_date, format="%Y-%m-%d")
-    
+    first_date = pd.to_datetime(start_date, infer_datetime_format=True)
+    print(type(first_date))
+    last_date = pd.to_datetime(end_date, infer_datetime_format=True)
+
     # Checks if the worked dates fall between the selected start and end date. Also check if employee id matches
     # NOTE: Using binary (&) operator to make comparison between datetime.timestamp and datetime64
     #  - Returns a parallel dataframe with true/false that show if the row in df_merged matches
     mask = ((df_merged.Date >= first_date) & (df_merged.Date <= last_date)) & (df_merged.EmployeeId == employee_id)
     df_merged = df_merged.loc[mask]
 
-    df_wage = ((df_merged.TimeOut - df_merged.TimeIn).dt.seconds / 3600) * df_merged.PayPerHour
-    return df_wage.sum()
+    # Currently set to 6 instead of 40 for easier testing purposes
+    # Need to verify if the given dates to  calculate pay have overtime hours
+    # if df_merged.Date.dt.dayofweek == 0 and last_date == 6:
+    #     regular_hours_limit = 6 
+    #     wage = calculate_overtime(df_merged, regular_hours_limit)
+    
+    return wage
 
 
 def main():
