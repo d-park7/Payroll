@@ -152,7 +152,6 @@ def calculate_pay(employee_id: int, start_date: str, end_date:str, df_employee, 
     # Assume that the user only is given the option of calculating the pay over a biweekly period
     # meaning that calcpay function does not need to take into account the number of weeks
     # Currently set to 20 instead of 40 for easier testing purposes
-    # Need to verify if the given dates to  calculate pay have overtime hours
     df_hours_worked = (df_merged.TimeOut - df_merged.TimeIn).dt.seconds / 3600
     regular_hours_limit = 20 
     if df_hours_worked.sum() >= regular_hours_limit:
