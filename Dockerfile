@@ -1,5 +1,5 @@
 # Pulls base python image from docker hub
-FROM python:3.9.1-buster
+FROM python:3.8.5-slim-buster
 
 # Create working directory
 RUN mkdir -p /app
@@ -12,7 +12,7 @@ WORKDIR /app
 COPY . .
 
 # Install required packages for the project
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 # Start flask server
-CMD [ "python", "app.py" ]
+CMD [ "python3", "app.py" ]

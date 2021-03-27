@@ -26,7 +26,8 @@ class TestCalcPay(unittest.TestCase):
         df_employee = pd.DataFrame.from_dict(employees)
         df_record = pd.DataFrame.from_dict(record)
         df_pay = pd.DataFrame.from_dict(pay)
-        result = calcpay.calculate_pay(1, "2021-01-01", "2021-01-02", df_employee, df_record, df_pay)
+        df_merged = calcpay.merge_dataframes(1, "2021-01-01", "2021-01-02", df_employee, df_record, df_pay)
+        result = calcpay.calculate_pay(df_merged)
         self.assertEqual(result, 20)
 
 
@@ -53,7 +54,8 @@ class TestCalcPay(unittest.TestCase):
         df_employee = pd.DataFrame.from_dict(employees)
         df_record = pd.DataFrame.from_dict(record)
         df_pay = pd.DataFrame.from_dict(pay)
-        result = calcpay.calculate_pay(1, "2021-01-01", "2021-01-02", df_employee, df_record, df_pay)
+        df_merged = calcpay.merge_dataframes(1, "2021-01-01", "2021-01-02", df_employee, df_record, df_pay)
+        result = calcpay.calculate_pay(df_merged)
         self.assertEqual(result, 140)
 
 
@@ -80,7 +82,8 @@ class TestCalcPay(unittest.TestCase):
         df_employee = pd.DataFrame.from_dict(employees)
         df_record = pd.DataFrame.from_dict(record)
         df_pay = pd.DataFrame.from_dict(pay)
-        result = calcpay.calculate_pay(1, "2021-01-01", "2021-01-02", df_employee, df_record, df_pay)
+        df_merged = calcpay.merge_dataframes(1, "2021-01-01", "2021-01-02", df_employee, df_record, df_pay)
+        result = calcpay.calculate_pay(df_merged)
         self.assertEqual(result, 290)
 
 if __name__ == "__main__":
