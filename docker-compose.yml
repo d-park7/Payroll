@@ -10,6 +10,10 @@ services:
     build:
       context: ./
 
+    # Allows program to print to terminal
+    environment:
+      - PYTHONUNBUFFERED=1
+
     # Name of the payroll image with version
     image: payroll:latest
 
@@ -19,3 +23,4 @@ services:
 
     volumes: 
       - ./:/app
+      # Look up how to add database on local

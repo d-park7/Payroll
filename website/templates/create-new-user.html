@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}New User Form{% endblock %}
+
+{% block content %}
+<h1>Create New Employee</h1>
+<form method="POST">
+    <div class="mb-3">
+        <label for="employeeId" class="form-label">Employee ID</label>
+        <input 
+            class="form-control" 
+            type="number"  
+            id="employeeId"
+            name="employeeId"
+        />
+    </div>
+    <div class="mb-3">
+        <label for="firstName" class="form-label">First Name</label>
+        <input 
+            class="form-control" 
+            type="text" 
+            id="firstName"
+            name="firstName"   
+        />
+    </div>
+    <div class="mb-3">
+        <label for="lastName" class="form-label">Last Name</label>
+        <input 
+            class="form-control" 
+            type="text" 
+            id="lastName"
+            name="lastName"   
+        />
+    </div>
+    <div class="mb-3">
+        <label for="payPerHour" class="form-label">Pay Per Hour</label>
+        <input 
+            class="form-control" 
+            type="number"
+            step="0.01" 
+            id="payPerHour"
+            name="payPerHour"   
+        />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}

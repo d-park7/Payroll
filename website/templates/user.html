@@ -1,20 +1,34 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html>
-    <head>
-        <title>user</title>
-    </head>
-    <body>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for msg in messages %}
-                    <p>{{msg}}</p>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <form action='#' method='POST'>
-            <input type ='email' name="email" placeholder="Enter Email" value="{{email if email}}"/>
-            <input type="submit" value="submit"/>
-        </form> 
-    </body>
-</html>
+{% block title %}User{% endblock %}
+
+{% block content %}
+<form method="POST">
+    <div vlass="mb-3">
+        <label for="employeeId" class="form-label">Employee ID</label>
+        <input 
+            class="form-control" 
+            type="number"  
+            id="employeeId"
+            name="employeeId"
+        />
+    </div>
+    <div class="mb-3">
+        <input 
+            class="btn btn-primary" 
+            type="submit"
+            id="clockIn" 
+            value="Clock in"
+            onclick="sendTimeToServer()"
+        />
+    </div>
+    <div class="mb-3">
+        <input 
+            class="btn btn-primary" 
+            type="submit"
+            id="clockOut" 
+            value="Clock out"
+        />
+    </div>
+</form>
+{% endblock %}

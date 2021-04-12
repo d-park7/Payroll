@@ -1,3 +1,7 @@
 Flask==1.1.2
 pandas==1.2.1
 Flask-SQLAlchemy==2.4.4
+Flask-Login==0.5.0
+pylint-flask-sqlalchemy==0.2.0
+pylint-flask==0.6
+pylint-plugin-utils==0.6

@@ -6,6 +6,8 @@ WORKDIR /app
 
 ENV FLASK_APP=main.py
 ENV FLASK_RUN_HOST=0.0.0.0
+# Run flask in debug mode
+ENV FLASK_DEBUG=1
 
 COPY requirements.txt requirements.txt
 
@@ -19,4 +21,4 @@ EXPOSE 5000
 COPY . .
 
 # Start flask server
-CMD [ "flask", "run" ]
+CMD ["flask", "run" ]
