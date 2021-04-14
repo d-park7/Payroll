@@ -21,6 +21,6 @@ class Pay(db.Model):
 class Record(db.Model):
     __tablename__ = 'Record'
     RecordId = db.Column(db.Integer, primary_key=True)
-    Date = db.Column(db.DateTime, default=datetime.utcnow)
+    Date = db.Column(db.DateTime, default=func.now())
     TimeInFlag = db.Column(db.Integer)
     EmployeeId = db.Column(db.Integer, db.ForeignKey('Employee.EmployeeId'))

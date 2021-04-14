@@ -19,7 +19,7 @@
             type="submit"
             id="clockIn" 
             value="Clock in"
-            onclick="sendTimeToServer()"
+            onclick="sendDateToServer()"
         />
     </div>
     <div class="mb-3">
@@ -28,7 +28,12 @@
             type="submit"
             id="clockOut" 
             value="Clock out"
+            onclick="sendDateToServer()"
         />
     </div>
 </form>
+<script>
+    type="text/javascript"
+    src="{{ url_for('static', filename='index.js') }}"
+</script>
 {% endblock %}

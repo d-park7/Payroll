@@ -46,18 +46,24 @@ def user():
     if request.method == 'POST':
         try:
             employee_id = request.form.get('employeeId')
-            date = request.form.get("clockIn")
-
+            clocked_in = request.form.get('clockIn')
+            print(clocked_in)
             employee = Employee.query.filter_by(EmployeeId=employee_id).first()
-            if employee != employee_id:
+
+            if employee.EmployeeId != int(employee_id):
                 flash('Did not find employee id!', category='error')
-            else:
-                new_record = Employee(EmployeeId=employee_id, Date=date, TimeInFlag=1)
+            elif clocked_in == True:
+                new_record = Record(EmployeeId=employee_id, Date=date, TimeInFlag=1)
                 db.session.add(new_record)
                 db.session.commit()
                 flash('Clocked in!', category='success')
+            else:
+                new_record = Record(EmployeeId=employee_id, Date=date, TimeInFlag=0)
+                db.session.add(new_record)
+                db.session.commit()
+                flash('Clocked out!', category='success')
         except Exception as e:
             db.session.rollback()
-            flash('Error in clocking in', category='error')
+            flash('Error in clocking in/out', category='error')
             print(e)
     return render_template("user.html")
