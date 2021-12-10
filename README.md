@@ -10,6 +10,12 @@ TO USE THIS:
 This program will calculate a given employee's wages from 2 selected dates.
 This project currently only sets up a very simple flask api and postgres database.
 
+## Goals
+
+1. Complete the backend
+2. Develop the react frontend
+3. Deploy onto heroku
+
 ## Additional Notes
 
 Ignore the *others* and *frontend* directory as I am currently updating this project.
