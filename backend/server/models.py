@@ -39,20 +39,20 @@ class Record(db.Model):
 
 
 class EmployeeSchema(ma.SQLAlchemySchema):
-    """Defines a marshmallow schema for employee data that is passed to/from frontend and backend"""
+    """Defines a marshmallow schema for employee data"""
     class Meta:
         fields = ('EmployeeId', 'FirstName', 'LastName')
 
 
 class PaySchema(ma.SQLAlchemySchema):
-    """Defines a marshmallow schema for employee data that is passed to/from frontend and backend"""
+    """Defines a marshmallow schema for employee data"""
     class Meta:
         include_fk = True
         fields = ('PayId', 'Date', 'PayPerHour', 'EmployeeId')
 
 
 class RecordSchema(ma.SQLAlchemySchema):
-    """Defines a marshmallow schema for employee data that is passed to/from frontend and backend"""
+    """Defines a marshmallow schema for employee data"""
     class Meta:
         include_fk = True
         fields = ('RecordId', 'Date', 'ClockedIn', 'EmployeeId')
