@@ -10,4 +10,4 @@ This program calculates a given employee's wages from 2 selected dates.
 
 ## Additional Notes
 
-Ignore the "others" directory as I am currently updating this project.
+Ignore the "others" and "frontend" directory as I am currently updating this project.
