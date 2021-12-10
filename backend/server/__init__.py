@@ -1,20 +1,21 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from os import path
+from flask_marshmallow import Marshmallow
 from flask_login import LoginManager
 
 
 db = SQLAlchemy()
-DB_NAME = "database.db"
-
+# flask_marshmallow is used to seralize/deseralize data to and from the frontend/backed
+ma = Marshmallow()
 
 def create_app():
     app = Flask(__name__)
 
     app.config['SECRET_KEY'] = 'david'
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://david:david@db/testpayroll'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
+    ma.init_app(app)
 
     # login_manager = LoginManager()
     # login_manager.login_view = 'auth.login'
@@ -37,6 +38,5 @@ def create_app():
 
 
 def create_database(app):
-    if not path.exists('website/' + DB_NAME):
-        db.create_all(app=app)
-        print('Created database!')
+    """Creates the postgresql database if not created"""
+    db.create_all(app=app)

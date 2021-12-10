@@ -1,26 +1,43 @@
 # Specify intial version
-version: '3.3'
+version: '3.7'
 
-# First service is payroll container (flask + SQLite)
+# First service is postgres database
 services:
+  db:
+    image: postgres:14.1
+    restart: always
+    container_name: postgres
+    ports: 
+      - '33867:3386'
+    environment:
+      - POSTGRES_DB=testpayroll
+      - POSTGRES_USER=david
+      - POSTGRES_PASSWORD=david
+    volumes:
+      - 'postgres_data:/var/lib/postgresql/data/'
+
+  # Second service is payroll container (flask backend)
   payroll:
     container_name: payroll
-
     # Runs Dockerfile build in the current directory
     build:
-      context: ./
-
+      context: ./backend
     # Allows program to print to terminal
     environment:
       - PYTHONUNBUFFERED=1
-
     # Name of the payroll image with version
     image: payroll:latest
-
     # Exposes host port to container port for communication
     ports:
-      - 5000:5000
-
+      - 5001:5000
     volumes: 
-      - ./:/app
-      # Look up how to add database on local
+      - ./backend:/app
+    depends_on:
+      - db
+
+  # Third service is the react front end (work in progress)
+
+
+# Used to create a persistant db even after container killed (maybe?)
+volumes:
+  postgres_data:
